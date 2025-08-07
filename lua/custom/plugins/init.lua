@@ -12,39 +12,90 @@ return {
     'xiyaowong/transparent.nvim',
   },
   {
+    'nvim-tree/nvim-tree.lua',
+    version = '*',
+    lazy = false,
+    dependencies = {
+      'nvim-tree/nvim-web-devicons',
+    },
+    config = function()
+      require('nvim-tree').setup {}
+      -- Map toggle Ctr + n to nvim-tree
+      map('n', '<C-n>', ':NvimTreeToggle<CR>', { noremap = true })
+    end,
+    opts = {
+      sort_by = 'case_sensitive',
+      view = {
+        width = 60,
+      },
+      renderer = {
+        group_empty = true,
+      },
+      filters = {
+        custom = { '.DS_Store' },
+      },
+    },
+  },
+  {
     'nvim-neotest/neotest',
     dependencies = {
       'nvim-neotest/nvim-nio',
       'nvim-lua/plenary.nvim',
       'antoinemadec/FixCursorHold.nvim',
       'nvim-treesitter/nvim-treesitter',
-      'marilari88/neotest-vitest',
+      'benelan/neotest-vitest',
     },
     config = function()
       local neotest = require 'neotest'
 
+      -- Function to extract package name from file path
+      local function get_package_name_from_path(file_path)
+        local package_pattern = 'packages/([^/]+)'
+        return file_path:match(package_pattern)
+      end
+
       neotest.setup {
         adapters = {
           require 'neotest-vitest' {
+            cwd = function(testFilePath)
+              return vim.fs.root(testFilePath, 'node_modules')
+            end,
             filter_dir = function(name, rel_path, root)
               return name ~= 'node_modules'
             end,
+            -- Default vitest command (fallback)
+            vitestCommand = 'npx projen test',
+            -- Enable debug mode to see more output
+            debug = false,
           },
         },
       }
-
+      -- -- Do not run with --testNamePattern because it's buggy
       map('n', '<Leader>tr', function()
         neotest.run.run()
         neotest.summary.open()
       end, { noremap = true, desc = 'Run Nearest' })
+
       map('n', '<leader>tc', function()
-        neotest.run.run(vim.fn.expand '%')
+        neotest.run.run { vim.fn.expand '%:p' }
         neotest.summary.open()
       end, { desc = 'Run Current File' })
-      map('n', '<Leader>tl', '<cmd>Neotest run last<CR>', { noremap = true })
-      map('n', '<Leader>ts', '<cmd>Neotest summary<CR>', { noremap = true })
-      map('n', '<leader>twr', "<cmd>lua require('neotest').run.run({ vitestCommand = 'vitest --watch' })<cr>", { desc = 'Run Watch' })
-      map('n', '<leader>twf', "<cmd>lua require('neotest').run.run({ vim.fn.expand('%'), vitestCommand = 'vitest --watch' })<cr>", { desc = 'Run Watch File' })
+
+      map('n', '<leader>tp', function()
+        neotest.output_panel.open()
+      end, { desc = 'Open Output Panel' })
+
+      -- map('n', '<Leader>tl', '<cmd>Neotest run last<CR>', { noremap = true })
+
+      map('n', '<Leader>ts', function()
+        neotest.summary.open()
+      end, { noremap = true, desc = 'Open Summary' })
+
+      map('n', '<leader>twf', function()
+        neotest.run.run { vim.fn.expand '%:p', vitestCommand = 'npx projen test:watch' }
+        neotest.summary.open()
+      end, { desc = 'Run Watch' })
+      -- map('n', '<leader>twf', "<cmd>lua require('neotest').run.run({ vim.fn.expand('%'), vitestCommand = 'vitest --watch' })<cr>", { desc = 'Run Watch File' })
     end,
   },
   {
@@ -54,8 +105,9 @@ return {
 
       map('n', '[e', '<cmd>Lspsaga diagnostic_jump_next<CR>')
       map('n', ']e', '<cmd>Lspsaga diagnostic_jump_prev<CR>')
-      map('n', 'd', '<cmd>Lspsaga peek_definition<CR>')
-      map('n', 'o', '<cmd>Lspsaga outline<CR>')
+      map('n', '<leader>d', '<cmd>Lspsaga peek_definition<CR>')
+      map('n', '<leader>i', '<cmd>Lspsaga finger imp<CR>')
+      map('n', '<leader>o', '<cmd>Lspsaga outline<CR>')
     end,
     dependencies = {
       'nvim-treesitter/nvim-treesitter', -- optional

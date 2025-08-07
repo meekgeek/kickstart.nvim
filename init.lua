@@ -177,6 +177,15 @@ vim.o.confirm = true
 -- Hide the command line when not use
 vim.opt.cmdheight = 0
 
+-- Folding
+vim.opt.foldmethod = 'expr'
+vim.opt.foldexpr = 'v:lua.vim.treesitter.foldexpr()'
+vim.opt.foldlevel = 99
+vim.opt.foldlevelstart = 2
+vim.opt.foldcolumn = '0'
+vim.opt.foldtext = ''
+vim.opt.foldnestmax = 4
+
 -- [[ Basic Keymaps ]]
 --  See `:help vim.keymap.set()`
 
@@ -424,6 +433,19 @@ require('lazy').setup({
         --     i = { ['<c-enter>'] = 'to_fuzzy_refine' },
         --   },
         -- },
+        defaults = {
+          -- Default configuration for telescope goes here:
+          -- config_key = value,
+          mappings = {
+            n = {
+              ['<c-d>'] = require('telescope.actions').delete_buffer,
+            }, -- n
+            i = {
+              ['<C-h>'] = 'which_key',
+              ['<c-d>'] = require('telescope.actions').delete_buffer,
+            }, -- i
+          }, -- mappings
+        }, -- defaults
         -- pickers = {}
         extensions = {
           ['ui-select'] = {
@@ -643,7 +665,8 @@ require('lazy').setup({
       vim.diagnostic.config {
         severity_sort = true,
         float = { border = 'rounded', source = 'if_many' },
-        underline = { severity = vim.diagnostic.severity.ERROR },
+        -- underline = { severity = vim.diagnostic.severity.ERROR },
+        underline = false,
         signs = vim.g.have_nerd_font and {
           text = {
             [vim.diagnostic.severity.ERROR] = '󰅚 ',
@@ -916,7 +939,7 @@ require('lazy').setup({
       -- Load the colorscheme here.
       -- Like many other themes, this one has different styles, and you could load
       -- any other, such as 'tokyonight-storm', 'tokyonight-moon', or 'tokyonight-day'.
-      vim.cmd.colorscheme 'tokyonight-night'
+      vim.cmd.colorscheme 'tokyonight-storm'
     end,
   },
 
