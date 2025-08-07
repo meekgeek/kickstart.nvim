@@ -170,8 +170,7 @@ vim.o.cursorline = true
 vim.o.scrolloff = 10
 
 -- Set the font
-vim.o.guifont = "Operator Mono:h10"
-
+vim.o.guifont = 'Operator Mono:h10'
 
 -- if performing an operation that would fail due to unsaved changes in the buffer (like `:q`),
 -- instead raise a dialog asking if you wish to save the current file(s)
@@ -185,7 +184,7 @@ vim.opt.cmdheight = 0
 vim.opt.foldmethod = 'expr'
 vim.opt.foldexpr = 'v:lua.vim.treesitter.foldexpr()'
 vim.opt.foldlevel = 99
-vim.opt.foldlevelstart = 2
+vim.opt.foldlevelstart = 4
 vim.opt.foldcolumn = '0'
 vim.opt.foldtext = ''
 vim.opt.foldnestmax = 4
